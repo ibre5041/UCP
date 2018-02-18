@@ -16,7 +16,7 @@ public class SimpleFan {
 		Properties p = new Properties();
 		p.put("serviceName", "ACTEST");
 
-		System.setProperty("oracle.ons.oraclehome", "C:\\oracle\\client_12.2.0.1");
+		System.setProperty("oracle.ons.oraclehome", "/opt/oracle/product/12.1.0");
 		System.out.println(System.getProperty("oracle.ons.oraclehome"));
 
 		FanSubscription sub = FanManager.getInstance().subscribe(p);
