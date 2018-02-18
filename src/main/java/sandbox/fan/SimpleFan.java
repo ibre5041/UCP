@@ -1,25 +1,54 @@
 // https://martincarstenbach.wordpress.com/2011/05/26/how-to-use-the-rac-fan-java-api/
 
+package sandbox.fan;
+
 import oracle.simplefan.FanSubscription;
 import oracle.simplefan.FanEventListener;
 import oracle.simplefan.FanManager;
 import oracle.simplefan.LoadAdvisoryEvent;
 import oracle.simplefan.NodeDownEvent;
 import oracle.simplefan.ServiceDownEvent;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class SimpleFan {
 
+	public static Properties loadProperties() {
+		Properties props = new Properties();
+		try {
+			InputStream is = SimpleFan.class.getResourceAsStream("/database.properties");
+			if (is != null) {
+				props.load(is);
+				is.close();
+			}
+		}
+		catch(IOException ioe) {
+			System.err.println("IOException in loadProps");
+			for(StackTraceElement ste : ioe.getStackTrace())
+				System.err.println(ste.toString());
+			System.exit(-1);
+		}
+		return props;
+	}
+
 	SimpleFan() {
 		System.out.println("Hello");
 
-		Properties p = new Properties();
-		p.put("serviceName", "ACTEST");
+		{
+			Properties props = loadProperties();
 
-		System.setProperty("oracle.ons.oraclehome", "/opt/oracle/product/12.1.0");
-		System.out.println(System.getProperty("oracle.ons.oraclehome"));
-
-		FanSubscription sub = FanManager.getInstance().subscribe(p);
+			String oraclehome = props.getProperty("oracle.ons.oraclehome");
+			if (oraclehome == null)
+				oraclehome = System.getenv("ORACLE_HOME");
+			System.setProperty("oracle.ons.oraclehome", oraclehome);
+			System.out.println(System.getProperty("oracle.ons.oraclehome"));
+		}
+		
+		Properties fanProperties = new Properties();
+		fanProperties.put("serviceName", "ACTEST");
+		FanSubscription sub = FanManager.getInstance().subscribe(fanProperties);
 
 		System.out.println("I'm subscribed!");
 
